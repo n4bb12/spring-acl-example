@@ -1,0 +1,19 @@
+type Note {
+  id: ID!
+  text: String!
+}
+
+type User {
+  name: String!
+  permissions:  [String!]!
+}
+
+type Query {
+  notes: [Note!]!
+  note(id: ID!): Note
+  me: User!
+}
+
+type Mutation {
+  updateNote(id: ID!, text: String!): Note
+}
