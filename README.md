@@ -11,7 +11,7 @@ Valid users are `admin`, `regular`, `anonymous` (default)
 
 ```json
 {
-  "X-User": "regular"
+  "X-User": "admin"
 }
 ```
 
