@@ -1,4 +1,4 @@
-package dev.n4bb12.spring.acl.example.security
+package dev.n4bb12.spring.acl.example.web
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,25 +16,25 @@ class WebSecurityConfiguration(val aclService: AclService) {
   @Bean
   fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
     return http
-        .httpBasic()
-        .disable()
-        .csrf()
-        .disable()
-        .formLogin()
-        .disable()
-        .logout()
-        .disable()
-        .sessionManagement()
-        .sessionCreationPolicy(STATELESS)
-        .and()
-        .headers()
-        .frameOptions()
-        .sameOrigin()
-        .and()
-        .authorizeRequests()
-        .anyRequest()
-        .permitAll()
-        .and()
-        .build()
+      .httpBasic()
+      .disable()
+      .csrf()
+      .disable()
+      .formLogin()
+      .disable()
+      .logout()
+      .disable()
+      .sessionManagement()
+      .sessionCreationPolicy(STATELESS)
+      .and()
+      .headers()
+      .frameOptions()
+      .sameOrigin()
+      .and()
+      .authorizeRequests()
+      .anyRequest()
+      .permitAll()
+      .and()
+      .build()
   }
 }

@@ -1,19 +1,18 @@
-package dev.n4bb12.spring.acl.example.security
+package dev.n4bb12.spring.acl.example.acl
 
-import org.springframework.cache.CacheManager
+import dev.n4bb12.spring.acl.example.permission.Permission
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
+import org.springframework.cache.support.NoOpCache
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler
-import org.springframework.security.acls.AclPermissionCacheOptimizer
 import org.springframework.security.acls.AclPermissionEvaluator
 import org.springframework.security.acls.domain.AclAuthorizationStrategy
 import org.springframework.security.acls.domain.AclAuthorizationStrategyImpl
 import org.springframework.security.acls.domain.AuditLogger
 import org.springframework.security.acls.domain.ConsoleAuditLogger
-import org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy
+import org.springframework.security.acls.domain.PermissionFactory
 import org.springframework.security.acls.domain.SpringCacheBasedAclCache
 import org.springframework.security.acls.jdbc.BasicLookupStrategy
 import org.springframework.security.acls.jdbc.JdbcMutableAclService
@@ -36,7 +35,7 @@ import javax.sql.DataSource
 class AclSecurityConfiguration(val dataSource: DataSource) {
 
   companion object {
-    const val cacheName = "aclCache"
+    const val alcCacheName = "aclCache"
   }
 
   /**
@@ -52,7 +51,8 @@ class AclSecurityConfiguration(val dataSource: DataSource) {
    */
   @Bean
   fun permissionGrantingStrategy(): PermissionGrantingStrategy {
-    return DefaultPermissionGrantingStrategy(auditLogger())
+//    return DefaultPermissionGrantingStrategy(auditLogger())
+    return CumulativePermissionGrantingStrategy(auditLogger())
   }
 
   /**
@@ -64,14 +64,9 @@ class AclSecurityConfiguration(val dataSource: DataSource) {
   }
 
   @Bean
-  fun cacheManager(): CacheManager {
-    return ConcurrentMapCacheManager(cacheName)
-  }
-
-  @Bean
   fun aclCache(): AclCache {
     return SpringCacheBasedAclCache(
-      cacheManager().getCache(cacheName), permissionGrantingStrategy(), aclAuthorizationStrategy()
+      NoOpCache(alcCacheName), permissionGrantingStrategy(), aclAuthorizationStrategy()
     )
   }
 
@@ -80,7 +75,8 @@ class AclSecurityConfiguration(val dataSource: DataSource) {
    */
   @Bean
   fun lookupStrategy(): LookupStrategy {
-    val lookupStrategy = BasicLookupStrategy(dataSource, aclCache(), aclAuthorizationStrategy(), auditLogger())
+    val lookupStrategy =
+      BasicLookupStrategy(dataSource, aclCache(), aclAuthorizationStrategy(), permissionGrantingStrategy())
     lookupStrategy.setAclClassIdSupported(true) // Enable support for String IDs
     return lookupStrategy
   }
@@ -96,14 +92,31 @@ class AclSecurityConfiguration(val dataSource: DataSource) {
   }
 
   /**
+   * A convenience wrapper around MutableAclService used by this example.
+   */
+  @Bean
+  fun aclService(): AclService {
+    return AclService(mutableAclService())
+  }
+
+  /**
+   * Maps permissions used in Spring security expressions to ACL permissions.
+   */
+  @Bean
+  fun permissionFactory(): PermissionFactory {
+    return AclPermissionFactory()
+  }
+
+  /**
    * Adds ACL support to the default method security expression handler.
    */
   @Bean
-  fun defaultMethodSecurityExpressionHandler(): MethodSecurityExpressionHandler? {
+  fun defaultMethodSecurityExpressionHandler(): MethodSecurityExpressionHandler {
     val expressionHandler = DefaultMethodSecurityExpressionHandler()
     val permissionEvaluator = AclPermissionEvaluator(mutableAclService())
+    permissionEvaluator.setPermissionFactory(permissionFactory())
     expressionHandler.setPermissionEvaluator(permissionEvaluator)
-    expressionHandler.setPermissionCacheOptimizer(AclPermissionCacheOptimizer(mutableAclService()))
+//    expressionHandler.setPermissionCacheOptimizer(AclPermissionCacheOptimizer(mutableAclService()))
     return expressionHandler
   }
 

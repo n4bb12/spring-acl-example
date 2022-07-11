@@ -62,8 +62,4 @@ mutation UpdateNote {
 
 ## Not included yet
 
-- Mapping Domain permissions to BasePermission
-- Example for creating/deleting ACLs on entity create/delete
-- Example for creating/deleting ACEs on linked user add/remove
-- Example for using only granted authority (short-circuiting ACLs)
-- No caching
+- Typed security annotations

@@ -1,19 +1,32 @@
+type User {
+  id: ID!
+  permissions: [String!]!
+}
+
+enum NoteUserLinkType {
+  VIEWER
+  EDITOR
+}
+
+type NoteUserLink {
+  user: User!
+  type: NoteUserLinkType!
+}
+
 type Note {
   id: ID!
   text: String!
 }
 
-type User {
-  name: String!
-  permissions:  [String!]!
+type Mutation {
+  editNote(id: ID!, text: String!): Note!
+  createNote(text: String!): Note!
+  deleteNote(id: ID!): ID
+  updateNoteUserLink(id: ID!, userIds: [ID!]!, linkType: NoteUserLinkType!): ID
 }
 
 type Query {
+  me: User!
   notes: [Note!]!
   note(id: ID!): Note
-  me: User!
-}
-
-type Mutation {
-  updateNote(id: ID!, text: String!): Note
 }

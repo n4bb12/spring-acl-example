@@ -1,23 +1,27 @@
 package dev.n4bb12.spring.acl.example.note
 
 import org.springframework.data.repository.CrudRepository
+import org.springframework.security.acls.model.MutableAclService
 import org.springframework.stereotype.Repository
 import java.util.Optional
 
 @Repository
-class NoteRepository : CrudRepository<Note, String> {
+class NoteRepository(private val mutableAclService: MutableAclService) : CrudRepository<Note, String> {
 
   val notes = mutableListOf(
-    Note("note-1", "Note 1"),
-    Note("note-2", "Note 2"),
-    Note("note-3", "Note 3"),
+    Note(text = "Note 1"),
+    Note(text = "Note 2"),
+    Note(text = "Note 3"),
   )
 
-  override fun <S : Note?> save(entity: S): S {
-    if (entity == null) {
-      return null as S
+  override fun <S : Note?> save(note: S): S {
+    if (note == null) {
+      throw IllegalArgumentException("Entity can not be null")
     }
-    return findById(entity.id).orElse(null)?.also { it.text = entity.text } as S
+
+    deleteById(note.id)
+    notes.add(note.copy())
+    return note
   }
 
   override fun <S : Note?> saveAll(entities: MutableIterable<S>): MutableIterable<S> {
@@ -25,7 +29,7 @@ class NoteRepository : CrudRepository<Note, String> {
   }
 
   override fun findById(id: String): Optional<Note> {
-    return Optional.ofNullable(notes.find { it.id == id })
+    return Optional.ofNullable(notes.find { it.id == id }?.copy())
   }
 
   override fun existsById(id: String): Boolean {
@@ -33,11 +37,11 @@ class NoteRepository : CrudRepository<Note, String> {
   }
 
   override fun findAll(): List<Note> {
-    return notes
+    return notes.map { it.copy() }
   }
 
   override fun count(): Long {
-		TODO("Not yet implemented")
+    TODO("Not yet implemented")
   }
 
   override fun deleteAll() {
@@ -57,7 +61,7 @@ class NoteRepository : CrudRepository<Note, String> {
   }
 
   override fun deleteById(id: String) {
-    TODO("Not yet implemented")
+    notes.removeIf { it.id == id }
   }
 
   override fun findAllById(ids: MutableIterable<String>): MutableIterable<Note> {

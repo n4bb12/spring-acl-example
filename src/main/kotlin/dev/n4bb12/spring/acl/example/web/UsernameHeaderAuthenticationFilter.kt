@@ -1,4 +1,4 @@
-package dev.n4bb12.spring.acl.example.security
+package dev.n4bb12.spring.acl.example.web
 
 import dev.n4bb12.spring.acl.example.user.UserService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -18,7 +18,7 @@ class UsernameHeaderAuthenticationFilter(val userService: UserService) : OncePer
     val name = request.getHeader("X-User")
     val user = userService.getUserByName(name) ?: userService.getUserByName(UserService.ANONYMOUS)!!
 
-    val principal = user
+    val principal = user.name
     val credentials = null
     val authorities = user.permissions.map { SimpleGrantedAuthority(it.name) }
 

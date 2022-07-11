@@ -1,4 +1,4 @@
-package dev.n4bb12.spring.acl.example.security
+package dev.n4bb12.spring.acl.example.web
 
 import dev.n4bb12.spring.acl.example.user.User
 import org.springframework.graphql.data.method.annotation.QueryMapping
