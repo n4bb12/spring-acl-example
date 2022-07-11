@@ -1,5 +1,7 @@
 package dev.n4bb12.spring.acl.example.acl
 
+import dev.n4bb12.spring.acl.example.init.AclEntriesInitializer
+import dev.n4bb12.spring.acl.example.init.CumulativeAclEntriesInitializer
 import dev.n4bb12.spring.acl.example.permission.Permission
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.support.NoOpCache
@@ -92,14 +94,6 @@ class AclSecurityConfiguration(val dataSource: DataSource) {
   }
 
   /**
-   * A convenience wrapper around MutableAclService used by this example.
-   */
-  @Bean
-  fun aclService(): AclService {
-    return AclService(mutableAclService())
-  }
-
-  /**
    * Maps permissions used in Spring security expressions to ACL permissions.
    */
   @Bean
@@ -118,6 +112,22 @@ class AclSecurityConfiguration(val dataSource: DataSource) {
     expressionHandler.setPermissionEvaluator(permissionEvaluator)
 //    expressionHandler.setPermissionCacheOptimizer(AclPermissionCacheOptimizer(mutableAclService()))
     return expressionHandler
+  }
+
+  /**
+   * A convenience wrapper around MutableAclService used by this example.
+   */
+  @Bean
+  fun aclService(): AclService {
+    return AclService(mutableAclService(), aclEntriesInitializer())
+  }
+
+  /**
+   * Determines which ACL entries need to be created for a specific entity, user, and list of permissions.
+   */
+  @Bean
+  fun aclEntriesInitializer(): AclEntriesInitializer {
+    return CumulativeAclEntriesInitializer()
   }
 
 }

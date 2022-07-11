@@ -1,12 +1,11 @@
 package dev.n4bb12.spring.acl.example.note
 
 import org.springframework.data.repository.CrudRepository
-import org.springframework.security.acls.model.MutableAclService
 import org.springframework.stereotype.Repository
 import java.util.Optional
 
 @Repository
-class NoteRepository(private val mutableAclService: MutableAclService) : CrudRepository<Note, String> {
+class NoteRepository : CrudRepository<Note, String> {
 
   val notes = mutableListOf(
     Note(text = "Note 1"),

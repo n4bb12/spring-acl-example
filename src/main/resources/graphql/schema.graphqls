@@ -16,13 +16,14 @@ type NoteUserLink {
 type Note {
   id: ID!
   text: String!
+  linkedUsers: [NoteUserLink!]!
 }
 
 type Mutation {
   editNote(id: ID!, text: String!): Note!
   createNote(text: String!): Note!
-  deleteNote(id: ID!): ID
-  updateNoteUserLink(id: ID!, userIds: [ID!]!, linkType: NoteUserLinkType!): ID
+  deleteNote(id: ID!): ID!
+  updateNoteUserLink(id: ID!, userIds: [ID!]!, linkType: NoteUserLinkType!): Note!
 }
 
 type Query {

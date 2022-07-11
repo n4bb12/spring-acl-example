@@ -29,6 +29,6 @@ class UserService {
 
   fun getAllUsers(): List<User> = users
 
-  fun getUserByName(name: String?): User? = users.find { it.name == name }
+  fun getUserByName(name: String?): User? = users.find { it.id == name }
 
 }

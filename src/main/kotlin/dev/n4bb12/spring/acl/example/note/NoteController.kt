@@ -23,11 +23,11 @@ class NoteController(val noteService: NoteService) {
   fun createNote(@Argument text: String): Note = noteService.create(text)
 
   @MutationMapping
-  fun deleteNote(@Argument id: String) = noteService.delete(id)
+  fun deleteNote(@Argument id: String): String = noteService.delete(id)
 
   @MutationMapping
   fun updateNoteUserLink(
     @Argument id: String, @Argument userIds: List<String>, @Argument linkType: NoteUserLinkType
-  ) = noteService.updateNoteUserLink(id, userIds, linkType)
+  ): Note = noteService.updateNoteUserLink(id, userIds, linkType)
 
 }

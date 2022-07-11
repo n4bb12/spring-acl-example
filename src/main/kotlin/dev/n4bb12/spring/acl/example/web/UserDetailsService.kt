@@ -13,7 +13,7 @@ class UserDetailsService(val userService: UserService) :
       ?: userService.getUserByName(UserService.ANONYMOUS)!!
 
     return User
-      .withUsername(user.name)
+      .withUsername(user.id)
       .password("")
       .authorities(*user.permissions.map { it.toString() }.toTypedArray())
       .build()

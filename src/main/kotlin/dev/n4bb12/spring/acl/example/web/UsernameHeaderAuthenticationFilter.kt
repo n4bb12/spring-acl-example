@@ -18,7 +18,7 @@ class UsernameHeaderAuthenticationFilter(val userService: UserService) : OncePer
     val name = request.getHeader("X-User")
     val user = userService.getUserByName(name) ?: userService.getUserByName(UserService.ANONYMOUS)!!
 
-    val principal = user.name
+    val principal = user.id
     val credentials = null
     val authorities = user.permissions.map { SimpleGrantedAuthority(it.name) }
 

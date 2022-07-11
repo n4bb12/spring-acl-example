@@ -21,6 +21,7 @@ class AclInitializer(
   val aclService: AclService,
   val noteRepository: NoteRepository,
   val userService: UserService,
+  val aclEntriesInitializer: AclEntriesInitializer,
 ) : ApplicationRunner {
 
   @Transactional
@@ -32,7 +33,6 @@ class AclInitializer(
     val notes = noteRepository.findAll()
     val users = userService.getAllUsers()
     val owner = PrincipalSid(UserService.ADMIN)
-    val entriesInitializer = CumulativeAclEntriesInitializer()
 
     println("[ACL] AclInitializer")
 
@@ -49,7 +49,7 @@ class AclInitializer(
       acl.owner = owner
 
       users.forEach { user ->
-        entriesInitializer.insertAces(acl, note, user)
+        aclEntriesInitializer.insertAces(acl, note.id, user.id, user.permissions)
       }
 
       aclService.updateAclWithAuditing(acl)
